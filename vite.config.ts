@@ -1,13 +1,37 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-
-export default defineConfig({
-  plugins: [react()],
-  define: {
-    'process.env.API_KEY': JSON.stringify(process.env.API_KEY),
-  },
-  build: {
-    outDir: 'dist',
-    emptyOutDir: true,
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enchanted Beginnings & Preschool LLC | Lafayette, IN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+      body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; }
+      h1, h2, h3, .font-display { font-family: 'Playfair+Display', serif; }
+      .gold-text { color: #D4AF37; }
+      .gold-bg { background-color: #D4AF37; }
+      .gold-border { border-color: #D4AF37; }
+      .sparkle { position: absolute; pointer-events: none; background: #D4AF37; border-radius: 50%; opacity: 0.6; animation: blink 2s infinite; }
+      @keyframes blink { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: 0.9; transform: scale(1.3); } }
+      html { scroll-behavior: smooth; }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.37.0",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
   }
-});
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./index.tsx"></script>
+  </body>
+</html>
