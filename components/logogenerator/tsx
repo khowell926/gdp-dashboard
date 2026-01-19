@@ -1,0 +1,89 @@
+import React, { useState, useEffect } from 'react';
+import { GoogleGenAI } from "@google/genai";
+
+interface LogoGeneratorProps {
+  onLogoGenerated: (url: string) => void;
+}
+
+const LogoGenerator: React.FC<LogoGeneratorProps> = ({ onLogoGenerated }) => {
+  const [status, setStatus] = useState<'idle' | 'generating' | 'error'>('generating');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    const generateLogo = async () => {
+      const apiKey = process.env.API_KEY;
+      
+      if (!apiKey || apiKey === 'undefined' || apiKey === '') {
+        setErrorMessage("API Key is missing. Please add your API key in the Vercel project settings to generate your custom logo.");
+        setStatus('error');
+        return;
+      }
+
+      try {
+        const ai = new GoogleGenAI({ apiKey });
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash-image',
+          contents: {
+            parts: [
+              {
+                text: "A professional, ultra-clean vector logo for a high-end childcare business named 'Enchanted Beginnings'. The symbol is a minimalist golden castle silhouette where the towers transition into open book pages at the base. A small elegant golden rose is tucked into the design. Background is pure white. Style: Modern, luxury gold foil texture, crisp lines, symmetrical, child-friendly but sophisticated for parents. No text in the image.",
+              },
+            ],
+          },
+          config: {
+            imageConfig: {
+              aspectRatio: "1:1"
+            }
+          },
+        });
+
+        if (response.candidates?.[0]?.content?.parts) {
+          const part = response.candidates[0].content.parts.find(p => p.inlineData);
+          if (part?.inlineData) {
+            const imageUrl = `data:image/png;base64,${part.inlineData.data}`;
+            onLogoGenerated(imageUrl);
+            setStatus('idle');
+          } else {
+            throw new Error("Logo generation failed: The AI did not return image data.");
+          }
+        } else {
+          throw new Error("Logo generation failed: Invalid response from the AI model.");
+        }
+      } catch (err: any) {
+        console.error("Logo generation failed:", err);
+        setErrorMessage(err?.message || "Something went wrong while conjuring your logo. Check your connection.");
+        setStatus('error');
+      }
+    };
+
+    generateLogo();
+  }, [onLogoGenerated]);
+
+  if (status === 'generating') {
+    return (
+      <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-4 bg-slate-900/90 border border-amber-500/30 px-6 py-3 rounded-full backdrop-blur-xl shadow-2xl animate-pulse">
+        <div className="w-4 h-4 rounded-full bg-amber-500 animate-ping"></div>
+        <span className="text-[10px] font-black uppercase tracking-[0.3em] gold-text">Conjuring Brand Identity...</span>
+      </div>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[60] flex flex-col items-center gap-2 bg-red-950/90 border border-red-500/30 px-6 py-4 rounded-2xl backdrop-blur-xl shadow-2xl max-w-xs text-center">
+        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400">Branding magic paused</span>
+        <p className="text-[11px] text-slate-300 mb-2">{errorMessage}</p>
+        <button 
+          onClick={() => window.location.hash = 'admin'}
+          className="text-[9px] font-bold gold-text underline uppercase tracking-widest"
+        >
+          View Launch Guide in Admin
+        </button>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+export default LogoGenerator;
